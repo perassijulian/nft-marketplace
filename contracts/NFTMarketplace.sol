@@ -33,7 +33,7 @@ contract NFTMarketplace is ERC721URIStorage {
         bool sold
     );
 
-    constructor() ERC721("Perassi Tokens", "PERA") {
+    constructor() ERC721("Metaverse Tokens", "METT") {
         owner = payable(msg.sender);
     }
 
