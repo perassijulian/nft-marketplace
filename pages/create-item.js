@@ -16,9 +16,11 @@ export default function CreateItem() {
     name: "",
     description: "",
   });
+  const [uploadingImage, setUploadingImage] = useState(false);
   const router = useRouter();
 
   async function onChange(e) {
+    setUploadingImage(true);
     /* upload image to IPFS */
     const file = e.target.files[0];
     try {
@@ -27,6 +29,7 @@ export default function CreateItem() {
       });
       const url = `https://ipfs.infura.io/ipfs/${added.path}`;
       setFileUrl(url);
+      setUploadingImage(false);
     } catch (error) {
       console.log("Error uploading file: ", error);
     }
@@ -73,7 +76,7 @@ export default function CreateItem() {
       value: listingPrice,
     });
     await transaction.wait();
-    console.log(transaction)
+    console.log(transaction);
 
     router.push("/");
   }
@@ -84,9 +87,7 @@ export default function CreateItem() {
         <input
           placeholder="Asset Name"
           className="mt-8 border rounded p-4"
-          onChange={(e) =>
-            setFormInput({ ...formInput, name: e.target.value })
-          }
+          onChange={(e) => setFormInput({ ...formInput, name: e.target.value })}
         />
         <textarea
           placeholder="Asset Description"
@@ -107,8 +108,9 @@ export default function CreateItem() {
         <button
           onClick={listNFTForSale}
           className="font-bold mt-4 bg-pink-500 text-white rounded p-4 shadow-lg"
+          disabled={uploadingImage}
         >
-          Create NFT
+          {uploadingImage? "Uploading Image" : "Create NFT"}
         </button>
       </div>
     </div>
