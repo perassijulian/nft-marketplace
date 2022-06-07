@@ -1,31 +1,16 @@
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Web3Modal from "web3modal";
 import { useRouter } from "next/router";
-
-import { marketplaceAddress } from "../config";
-
-import NFTMarketplace from "../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json";
+import { getContractSigned } from "../utils/getContract";
 
 export default function MyAssets() {
   const [nfts, setNfts] = useState([]);
   const [loadingState, setLoadingState] = useState("not-loaded");
   const router = useRouter();
-  useEffect(() => {
-    loadNFTs();
-  }, []);
+  
   async function loadNFTs() {
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
-
-    const contract = new ethers.Contract(
-      marketplaceAddress,
-      NFTMarketplace.abi,
-      signer
-    );
+    const contract = await getContractSigned();
     const data = await contract.fetchMyNFTs();
 
     const items = await Promise.all(
@@ -48,6 +33,10 @@ export default function MyAssets() {
     setLoadingState("loaded");
   }
 
+  useEffect(() => {
+    loadNFTs();
+  }, []);
+
   if (loadingState === "loaded" && !nfts.length)
     return <h1 className="py-10 px-20 text-3xl">No NFTs owned</h1>;
 
@@ -63,6 +52,12 @@ export default function MyAssets() {
                   Price - {nft.price} Eth
                 </p>
               </div>
+              <button
+                className="w-full bg-pink-500 text-white text-bold py-2 px-12 mt-4 rounded"
+                onClick={() => router.push(`/resell?tokenId=${nft.tokenId}&tokenURI=${nft.tokenURI}`)}
+              >
+                Sell
+              </button>
             </div>
           ))}
         </div>

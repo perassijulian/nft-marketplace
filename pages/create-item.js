@@ -1,22 +1,19 @@
 import { ethers } from "ethers";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import { create as ipfsHttpClient } from "ipfs-http-client";
-import Web3Modal from "web3modal";
-
-import { marketplaceAddress } from "../config";
-import NFTMarketplace from "../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json";
+import { getContractSigned } from "../utils/getContract";
 
 const client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0");
 
 export default function CreateItem() {
   const [fileUrl, setFileUrl] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [formInput, setFormInput] = useState({
     price: "",
     name: "",
     description: "",
   });
-  const [uploadingImage, setUploadingImage] = useState(false);
   const router = useRouter();
 
   async function onChange(e) {
@@ -56,19 +53,10 @@ export default function CreateItem() {
 
   async function listNFTForSale() {
     const url = await uploadToIPFS();
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
+    const contract = await getContractSigned();
 
     /* create the NFT */
     const price = ethers.utils.parseUnits(formInput.price, "ether");
-
-    let contract = new ethers.Contract(
-      marketplaceAddress,
-      NFTMarketplace.abi,
-      signer
-    );
 
     let listingPrice = await contract.getListingPrice();
     listingPrice = listingPrice.toString();
@@ -76,7 +64,6 @@ export default function CreateItem() {
       value: listingPrice,
     });
     await transaction.wait();
-    console.log(transaction);
 
     router.push("/");
   }
@@ -110,7 +97,7 @@ export default function CreateItem() {
           className="font-bold mt-4 bg-pink-500 text-white rounded p-4 shadow-lg"
           disabled={uploadingImage}
         >
-          {uploadingImage? "Uploading Image" : "Create NFT"}
+          {uploadingImage ? "Uploading Image" : "Create NFT"}
         </button>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import axios from "axios";
 import Web3Modal from "web3modal";
 
@@ -10,6 +11,7 @@ import NFTMarketplace from "../artifacts/contracts/NFTMarketplace.sol/NFTMarketp
 export default function Home() {
   const [nfts, setNfts] = useState([]);
   const [loadingState, setLoadingState] = useState("not-loaded");
+  const router = useRouter();
 
   useEffect(() => {
     loadNFTs();
@@ -63,7 +65,8 @@ export default function Home() {
       value: price,
     });
     await transaction.wait();
-    loadNFTs();
+
+    router.push("/my-assets");
   }
 
   if (loadingState == "loaded" && !nfts.length)
@@ -73,23 +76,31 @@ export default function Home() {
     <div className="flex justify-center">
       <div className="px-4" style={{ maxWidth: "1600px" }}>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
-        {
-          nfts.map((nft, i) => (
+          {nfts.map((nft, i) => (
             <div key={i} className="border shadow rounded-xl overflow-hidden">
-              <img src={nft.image} style={{maxHeight:'300px'}}/>
+              <img src={nft.image} style={{ maxHeight: "300px" }} />
               <div className="p-4">
-                <p style={{ height: '64px' }} className="text-2xl font-semibold">{nft.name}</p>
-                <div style={{ height: '70px', overflow: 'hidden' }}>
+                <p
+                  style={{ height: "64px" }}
+                  className="text-2xl font-semibold"
+                >
+                  {nft.name}
+                </p>
+                <div style={{ height: "70px", overflow: "hidden" }}>
                   <p className="text-gray-400">{nft.description}</p>
                 </div>
               </div>
               <div className="p-4 bg-black">
                 <p className="text-2xl font-bold text-white">{nft.price} ETH</p>
-                <button className="mt-4 w-full bg-pink-500 text-white font-bold py-2 px-12 rounded" onClick={() => buyNft(nft)}>Buy</button>
+                <button
+                  className="mt-4 w-full bg-pink-500 text-white font-bold py-2 px-12 rounded"
+                  onClick={() => buyNft(nft)}
+                >
+                  Buy
+                </button>
               </div>
             </div>
-          ))
-        }
+          ))}
         </div>
       </div>
     </div>
