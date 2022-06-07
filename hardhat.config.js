@@ -1,16 +1,18 @@
 require("@nomiclabs/hardhat-waffle");
+require('dotenv').config();
+
+const { API_URL, PRIVATE_KEY } = process.env;
 
 module.exports = {
-  defaultNetwork: "hardhat",
+  defaultNetwork: "matic",
   networks: {
     hardhat: {
       chainId: 1337,
     },
-    //  unused configuration commented out for now
-    //  mumbai: {
-    //    url: "https://rpc-mumbai.maticvigil.com",
-    //    accounts: [process.env.privateKey]
-    //  }
+    mumbai: {
+      url: API_URL,
+      accounts: [`0x${PRIVATE_KEY}`]
+    },
   },
   solidity: {
     version: "0.8.4",
