@@ -4,7 +4,7 @@ require('dotenv').config();
 const { API_URL, PRIVATE_KEY } = process.env;
 
 module.exports = {
-  defaultNetwork: "matic",
+  defaultNetwork: "mumbai",
   networks: {
     hardhat: {
       chainId: 1337,
