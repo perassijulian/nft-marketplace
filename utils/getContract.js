@@ -18,7 +18,6 @@ export const getContractSigned = async () => {
 };
 
 export const getContractPublic = async () => {
-  console.log(process.env.NEXT_PUBLIC_API_URL)
   const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_API_URL);
   const contract = new ethers.Contract(
     marketplaceAddress,

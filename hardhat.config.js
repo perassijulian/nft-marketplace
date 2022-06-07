@@ -1,7 +1,7 @@
 require("@nomiclabs/hardhat-waffle");
 require('dotenv').config();
 
-const { API_URL, PRIVATE_KEY } = process.env;
+const { NEXT_PUBLIC_API_URL, PRIVATE_KEY } = process.env;
 
 module.exports = {
   defaultNetwork: "mumbai",
@@ -10,7 +10,7 @@ module.exports = {
       chainId: 1337,
     },
     mumbai: {
-      url: API_URL,
+      url: NEXT_PUBLIC_API_URL,
       accounts: [`0x${PRIVATE_KEY}`]
     },
   },
