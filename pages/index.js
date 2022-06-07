@@ -2,11 +2,8 @@ import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
-import Web3Modal from "web3modal";
 
-import { marketplaceAddress } from "../config";
-
-import NFTMarketplace from "../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json";
+import { getContractPublic, getContractSigned } from "../utils/getContract";
 
 export default function Home() {
   const [nfts, setNfts] = useState([]);
@@ -18,12 +15,7 @@ export default function Home() {
   }, []);
 
   async function loadNFTs() {
-    const provider = new ethers.providers.JsonRpcProvider();
-    const contract = new ethers.Contract(
-      marketplaceAddress,
-      NFTMarketplace.abi,
-      provider
-    );
+    const contract = await getContractPublic();
     const data = await contract.fetchMarketItems();
 
     const items = await Promise.all(
@@ -49,15 +41,7 @@ export default function Home() {
 
   async function buyNft(nft) {
     /* needs the user to sign the transaction, so will use Web3Provider and sign it */
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(
-      marketplaceAddress,
-      NFTMarketplace.abi,
-      signer
-    );
+    const contract = await getContractSigned();
 
     /* user will be prompted to pay the asking proces to complete the transaction */
     const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
