@@ -1,6 +1,9 @@
 const hre = require("hardhat");
 const fs = require("fs");
 
+const frontEndAbiFile = "./constants/abi.json";
+const frontEndContractsFile = "./constants/address.js";
+
 async function main() {
   const NFTMarketplace = await hre.ethers.getContractFactory("NFTMarketplace");
   const nftMarketplace = await NFTMarketplace.deploy();
@@ -9,10 +12,15 @@ async function main() {
   console.log("Marketplace deployed to: ", nftMarketplace.address);
 
   fs.writeFileSync(
-    "./config.js",
+    frontEndContractsFile,
     `
   export const marketplaceAddress = "${nftMarketplace.address}"
   `
+  );
+
+  fs.writeFileSync(
+    frontEndAbiFile,
+    nftMarketplace.interface.format(ethers.utils.FormatTypes.json)
   );
 }
 
