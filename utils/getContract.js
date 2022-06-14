@@ -2,7 +2,6 @@ import { ethers } from "ethers";
 import Web3Modal, { getChainId } from "web3modal";
 
 import marketplaceAddresses from "../constants/address.json";
-// import NFTMarketplace from "../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json";
 import abi from "../constants/abi.json";
 
 export const getContractSigned = async () => {

@@ -6,32 +6,51 @@ import { getContractSigned } from "../utils/getContract";
 export default function CreatorDashboard() {
   const [nfts, setNfts] = useState([]);
   const [loadingState, setLoadingState] = useState("not-loaded");
+  const [error, setError] = useState(null);
+
+  async function loadNFTs() {
+    setError(null);
+    const { contract, provider } = await getContractSigned();
+
+    const { chainId } = await provider.getNetwork();
+    if (chainId !== 80001) {
+      setError("Please connect to Mumbai network and refresh!");
+      setLoadingState("loaded");
+      return;
+    }
+
+    try {
+      const data = await contract.fetchItemsListed();
+
+      const items = await Promise.all(
+        data.map(async (i) => {
+          const tokenUri = await contract.tokenURI(i.tokenId);
+          const meta = await axios.get(tokenUri);
+          let price = ethers.utils.formatUnits(i.price.toString(), "ether");
+          let item = {
+            price,
+            tokenId: i.tokenId.toNumber(),
+            seller: i.seller,
+            owner: i.owner,
+            image: meta.data.image,
+          };
+          return item;
+        })
+      );
+
+      setNfts(items);
+      setLoadingState("loaded");
+    } catch (e) {
+      console.log(e);
+      setError(e);
+    }
+  }
+
   useEffect(() => {
     loadNFTs();
   }, []);
-  async function loadNFTs() {
-    const contract = await getContractSigned();
-    const data = await contract.fetchItemsListed();
 
-    const items = await Promise.all(
-      data.map(async (i) => {
-        const tokenUri = await contract.tokenURI(i.tokenId);
-        const meta = await axios.get(tokenUri);
-        let price = ethers.utils.formatUnits(i.price.toString(), "ether");
-        let item = {
-          price,
-          tokenId: i.tokenId.toNumber(),
-          seller: i.seller,
-          owner: i.owner,
-          image: meta.data.image,
-        };
-        return item;
-      })
-    );
-
-    setNfts(items);
-    setLoadingState("loaded");
-  }
+  if (error) return <h1 className="py-10 px-20 text-3xl">{error}</h1>;
 
   if (loadingState === "loaded" && !nfts.length)
     return <h1 className="py-10 px-20 text-3xl">No NFTs listed</h1>;

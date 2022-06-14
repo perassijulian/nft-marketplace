@@ -54,6 +54,7 @@ export default function CreateItem() {
   }
 
   async function listNFTForSale() {
+    setError(null);
     const { contract, provider } = await getContractSigned();
 
     const { chainId } = await provider.getNetwork();
@@ -99,15 +100,22 @@ export default function CreateItem() {
           }
         />
         <input
-          placeholder="Asset Price in Eth"
+          placeholder="Asset Price in MATIC"
           className="mt-2 border rounded p-4"
           onChange={(e) =>
             setFormInput({ ...formInput, price: e.target.value })
           }
         />
         <input type="file" name="Asset" className="my-4" onChange={onChange} />
-        {fileUrl && <img className="rounded mt-4" width="350" src={fileUrl} />}
-        {error && <div>{error}</div>}
+        <div className="flex flex-col items-center">
+          {uploadingImage && (
+            <div className="h-60 px-28 animate-pulse bg-gray-300 rounded-lg"></div>
+          )}
+          {fileUrl && (
+            <img className="rounded mt-4 h-60 w-auto" src={fileUrl} />
+          )}
+          {error && <div className="font-bold text-red-500 mt-8">{error}</div>}
+        </div>
         <button
           onClick={listNFTForSale}
           className="font-bold mt-4 bg-pink-500 text-white rounded p-4 shadow-lg"
