@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { create as ipfsHttpClient } from "ipfs-http-client";
 import { getContractSigned } from "../utils/getContract";
+import { getChainId } from "web3modal";
 
 const client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0");
 
@@ -14,6 +15,7 @@ export default function CreateItem() {
     name: "",
     description: "",
   });
+  const [error, setError] = useState(null);
   const router = useRouter();
 
   async function onChange(e) {
@@ -52,20 +54,33 @@ export default function CreateItem() {
   }
 
   async function listNFTForSale() {
+    const { contract, provider } = await getContractSigned();
+
+    const { chainId } = await provider.getNetwork();
+    if (chainId !== 80001) {
+      setError("Please connect to Mumbai network!");
+      return;
+    }
+
     const url = await uploadToIPFS();
-    const contract = await getContractSigned();
 
     /* create the NFT */
     const price = ethers.utils.parseUnits(formInput.price, "ether");
-
     let listingPrice = await contract.getListingPrice();
     listingPrice = listingPrice.toString();
-    let transaction = await contract.createToken(url, price, {
-      value: listingPrice,
-    });
-    await transaction.wait();
-
-    router.push("/");
+    try {
+      let transaction = await contract.createToken(url, price, {
+        value: listingPrice,
+      });
+      await transaction.wait();
+      router.push("/");
+    } catch (e) {
+      e.data.code == -32000
+        ? setError(
+            "You do not have sufficient funds. Consider getting more at a mumbai faucet"
+          )
+        : setError(e.data.message);
+    }
   }
 
   return (
@@ -92,6 +107,7 @@ export default function CreateItem() {
         />
         <input type="file" name="Asset" className="my-4" onChange={onChange} />
         {fileUrl && <img className="rounded mt-4" width="350" src={fileUrl} />}
+        {error && <div>{error}</div>}
         <button
           onClick={listNFTForSale}
           className="font-bold mt-4 bg-pink-500 text-white rounded p-4 shadow-lg"

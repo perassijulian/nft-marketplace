@@ -1,18 +1,23 @@
 require("@nomiclabs/hardhat-waffle");
-require('dotenv').config();
+require("dotenv").config();
 
-const { NEXT_PUBLIC_API_URL, PRIVATE_KEY } = process.env;
+const NEXT_PUBLIC_API_URL_MUMBAI = process.env.NEXT_PUBLIC_API_URL_MUMBAI;
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 module.exports = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      chainId: 1337,
+      chainId: 31337,
     },
-    // mumbai: {
-    //   url: NEXT_PUBLIC_API_URL,
-    //   accounts: [`0x${PRIVATE_KEY}`]
-    // },
+    localhost: {
+      chainId: 31337,
+    },
+    mumbai: {
+      url: NEXT_PUBLIC_API_URL_MUMBAI,
+      accounts: [`0x${PRIVATE_KEY}`],
+      chainId: 80001
+    },
   },
   solidity: {
     version: "0.8.4",
