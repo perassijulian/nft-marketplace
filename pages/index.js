@@ -16,6 +16,7 @@ export default function Home() {
   }, []);
 
   async function loadNFTs() {
+    console.log(1);
     const contract = await getContractPublic();
     const data = await contract.fetchMarketItems();
 
@@ -36,6 +37,8 @@ export default function Home() {
         return item;
       })
     );
+    console.log(2);
+
     setNfts(items);
     setLoadingState("loaded");
   }
@@ -76,7 +79,17 @@ export default function Home() {
   return (
     <div className="flex justify-center">
       <div className="px-4" style={{ maxWidth: "1600px" }}>
+        {error && (
+          <div className="flex justify-center">
+            <div className="font-bold text-red-500 mt-4 animate-pulse">
+              {error}
+            </div>
+          </div>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
+          {loadingState === "not-loaded" && (
+            <div className="animate-spin p-5 border-b-4 rounded-full w-3 h-3 border-pink-500 mt-4"></div>
+          )}
           {nfts.map((nft, i) => (
             <div
               key={i}
@@ -95,7 +108,9 @@ export default function Home() {
                 </div>
               </div>
               <div className="p-4 bg-pink-300 w-full">
-                <p className="text-2xl font-bold text-white">{nft.price} MATIC</p>
+                <p className="text-2xl font-bold text-white">
+                  {nft.price} MATIC
+                </p>
                 <button
                   className="mt-4 w-full bg-pink-500 text-white font-bold py-2 px-12 rounded"
                   onClick={() => buyNft(nft)}
@@ -106,11 +121,6 @@ export default function Home() {
             </div>
           ))}
         </div>
-        {error && (
-          <div className="flex justify-center">
-            <div className="font-bold text-red-500 mt-8 animate-pulse">{error}</div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -60,6 +60,9 @@ export default function CreatorDashboard() {
       <div className="p-4">
         <h2 className="text-2xl py-2">Items Listed</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
+          {loadingState === "not-loaded" && (
+            <div className="animate-spin p-5 border-b-4 rounded-full w-3 h-3 border-pink-500 mt-4"></div>
+          )}
           {nfts.map((nft, i) => (
             <div
               key={i}

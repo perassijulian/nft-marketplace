@@ -10,8 +10,6 @@ async function main() {
   const nftMarketplace = await NFTMarketplace.deploy();
   await nftMarketplace.deployed();
 
-  console.log('network.config:', network.config);
-  console.log('network.config.chainId:', network.config.chainId);
   const chainId = network.config.chainId.toString();
   const addresses = JSON.parse(fs.readFileSync(frontEndContractsFile, "utf-8"));
   if (chainId in addresses) {
